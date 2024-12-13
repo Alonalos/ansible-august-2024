@@ -1,0 +1,35 @@
+- name: Install mysql
+  ansible.builtin.apt:
+    name: mysql-server
+    #mysql-server is a package name
+    state: present
+    update_cache: yes
+
+- name: Start service mysql
+  ansible.builtin.service:
+    name: mysql
+    #linux command 'systemctl start mysql'
+    state: started    
+    enabled: yes
+
+- name: Install PyMySQL
+  ansible.builtin.apt:
+    name: python3-pymysql
+    # package name
+    state: present    
+
+- name: Create a new database with name 'kaizen'
+  community.mysql.mysql_db:
+    name: kaizen
+    state: present
+    login_unix_socket: /run/mysqld/mysqld.sock  
+    #enable login for ansible aka passworless login as root user  
+
+- name: Create database user and all database privileges
+  community.mysql.mysql_user:
+    name: hello_user
+    password: Hello12345
+    priv: '*.*:ALL'
+    state: present   
+    login_unix_socket: /run/mysqld/mysqld.sock  
+    #enable login for ansible 

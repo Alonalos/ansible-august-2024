@@ -1,0 +1,30 @@
+- name: Download wordpress
+  ansible.builtin.get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: /tmp/wordpress.tar.gz
+    #download and rename to disregard the version 
+
+- name: Extract wordpress
+  ansible.builtin.unarchive:
+    src: /tmp/wordpress.tar.gz
+    #ansible source
+    dest: /tmp    
+    #remote source
+    remote_src: yes
+    #expect src the file to exist on the remote
+
+- name: Copy file with owner and permissions
+  ansible.builtin.copy:
+    src: /tmp/wordpress/.
+    #. means everything in the navigated folder
+    dest: /var/www/html
+    owner: www-data
+    group: www-data
+    mode: '0755'    
+    remote_src: yes
+
+#we have 2 index files and need to delete 1
+- name: Remove index.html
+  ansible.builtin.file:
+    path: /var/www/html/index.html
+    state: absent   
