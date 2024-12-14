@@ -1,0 +1,7 @@
+packages:
+- php
+- php-mysql
+- php-xml
+- php-mbstring
+- php-curl
+- php-zip

@@ -1,0 +1,40 @@
+- name: Download wordpress
+  ansible.builtin.get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: "{{ dest }}"
+    #download and rename to disregard the version 
+
+- name: Extract wordpress
+  ansible.builtin.unarchive:
+    src: "{{ dest }}"
+    #ansible source
+    dest: /tmp    
+    #remote source
+    remote_src: yes
+    #indicates this is a path on the remote machine
+
+- name: Copy file with owner and permissions
+  ansible.builtin.copy:
+    src: /tmp/wordpress/.
+    #. means everything in the navigated folder
+    dest: /var/www/html
+    owner: www-data
+    group: www-data
+    mode: '0755'    
+    remote_src: yes
+
+#we have 2 index files and need to delete 1
+- name: Remove index.html
+  ansible.builtin.file:
+    path: /var/www/html/index.html
+    state: absent   
+
+- name: Change file ownership, group and permissions
+  ansible.builtin.template:
+    src: /home/ubuntu/ansible-august-2024/Roles/wordpress/templates/wp-config-sample.php.j2
+    dest: /var/www/html/wp-config.php
+  #wp-config.php has login details to the database so here we edited it on our local and sent to the remote
+  #1 scp ubuntu@13.58.225.75:/var/www/html/wp-config-samle.php .
+  #2 edit db creadentials
+  #3 send it to the remote
+  # ansible.builtin.template because templates support variables and wp-config-sample.php.j2 has some variables
